@@ -90,6 +90,12 @@ class Net(nn.Module):
 
 
 net = Net()
+net = torchvision.models.resnet18(pretrained=True)
+for param in net.parameters():
+    param.requires_grad = False
+
+num_ftrs = net.fc.in_features
+net.fc = nn.Linear(num_ftrs, len(classes))
 #net.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -114,9 +120,9 @@ if __name__ == '__main__':
 
             # print statistics
             running_loss += loss.item()
-            if i % 2000 == 1999:  # print every 2000 mini-batches
+            if i % 500 == 499:  # print every 2000 mini-batches
                 print('[%d, %5d] loss: %.5f' %
-                      (epoch + 1, i + 1, running_loss / 2000))
+                      (epoch + 1, i + 1, running_loss / 500))
                 running_loss = 0.0
 
     print('Finished Training')
