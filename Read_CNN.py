@@ -90,25 +90,25 @@ class Net(nn.Module):
 
 
 net = Net()
-net = torchvision.models.resnet18(pretrained=True)
-for param in net.parameters():
-    param.requires_grad = False
-
-num_ftrs = net.fc.in_features
-net.fc = nn.Sequential(nn.Linear(num_ftrs, num_ftrs),
-                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
-                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
-                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
-                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
-                       nn.Tanh(), nn.Linear(num_ftrs, len(classes))
-                       )
+# net = torchvision.models.resnet18(pretrained=True)
+# for param in net.parameters():
+#     param.requires_grad = False
+#
+# num_ftrs = net.fc.in_features
+# net.fc = nn.Sequential(nn.Linear(num_ftrs, num_ftrs),
+#                        nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+#                        nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+#                        nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+#                        nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+#                        nn.Tanh(), nn.Linear(num_ftrs, len(classes))
+#                        )
 
 #net.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 if __name__ == '__main__':
-    for epoch in range(5):  # loop over the dataset multiple times
+    for epoch in range(1):  # loop over the dataset multiple times
 
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
@@ -134,9 +134,8 @@ if __name__ == '__main__':
 
     print('Finished Training')
 
-torch.save(net.state_dict(), "transfer-4-tanh.model")
+torch.save(net.state_dict(), "transfer-4-tanh.pt")
 
-    # How well does the network perform?
 if __name__ == '__main__':
     correct = 0
     total = 0
@@ -151,21 +150,22 @@ if __name__ == '__main__':
     print('Accuracy of the network on the test images: %d %%' % (
             100 * correct / total))
 
-# What classes perform well?
-if __name__ == '__main__':
-    class_correct = list(0. for i in range(len(classes)))
-    class_total = list(0. for i in range(len(classes)))
-    with torch.no_grad():
-        for data in testloader:
-            images, labels = data
-            outputs = net(images)
-            _, predicted = torch.max(outputs, 1)
-            c = (predicted == labels).squeeze()
-            for i in range(4):
-                label = labels[i]
-                class_correct[label] += c[i].item()
-                class_total[label] += 1
+    # What classes perform well?
+    if __name__ == '__main__':
+        class_correct = list(0. for i in range(len(classes)))
+        class_total = list(0. for i in range(len(classes)))
+        with torch.no_grad():
+            for data in testloader:
+                images, labels = data
+                outputs = net(images)
+                _, predicted = torch.max(outputs, 1)
+                if len(labels) != 1:
+                    c = (predicted == labels).squeeze()
+                for i in range(len(labels)):
+                    label = labels[i]
+                    class_correct[label] += c[i].item()
+                    class_total[label] += 1
 
-    for i in range(len(classes)):
-        print('Accuracy of %5s : %2d %%' % (
-            classes[i], 100 * class_correct[i] / class_total[i]))
+        for i in range(len(classes)):
+            print('Accuracy of %5s : %2d %%' % (
+                classes[i], 100 * class_correct[i] / class_total[i]))
