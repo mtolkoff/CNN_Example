@@ -95,13 +95,20 @@ for param in net.parameters():
     param.requires_grad = False
 
 num_ftrs = net.fc.in_features
-net.fc = nn.Linear(num_ftrs, len(classes))
+net.fc = nn.Sequential(nn.Linear(num_ftrs, num_ftrs),
+                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+                       nn.Tanh(), nn.Linear(num_ftrs, num_ftrs),
+                       nn.Tanh(), nn.Linear(num_ftrs, len(classes))
+                       )
+
 #net.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 if __name__ == '__main__':
-    for epoch in range(40):  # loop over the dataset multiple times
+    for epoch in range(5):  # loop over the dataset multiple times
 
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
@@ -126,6 +133,8 @@ if __name__ == '__main__':
                 running_loss = 0.0
 
     print('Finished Training')
+
+torch.save(net.state_dict(), "transfer-4-tanh.model")
 
     # How well does the network perform?
 if __name__ == '__main__':
