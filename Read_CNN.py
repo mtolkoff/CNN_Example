@@ -24,8 +24,6 @@ if __name__ == '__main__':
     classes = os.listdir('Data/intel/seg_test')
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# classes = ('plane', 'car', 'bird', 'cat',
-#           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
 # if __name__ == '__main__':
